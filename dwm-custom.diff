@@ -1,0 +1,421 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..095e840
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++*.o
++dwm
+diff --git a/config.def.h b/config.def.h
+index 9efa774..79ae7cf 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -2,6 +2,7 @@
+ 
+ /* appearance */
+ static const unsigned int borderpx  = 1;        /* border pixel of windows */
++static const unsigned int gappx     = 6;        /* gaps between windows */
+ static const unsigned int snap      = 32;       /* snap pixel */
+ static const int showbar            = 1;        /* 0 means no bar */
+ static const int topbar             = 1;        /* 0 means bottom bar */
+@@ -34,7 +35,7 @@ static const Rule rules[] = {
+ /* layout(s) */
+ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+ static const int nmaster     = 1;    /* number of clients in master area */
+-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
++static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
+ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+ 
+ static const Layout layouts[] = {
+diff --git a/config.h b/config.h
+new file mode 100755
+index 0000000..9f57acd
+--- /dev/null
++++ b/config.h
+@@ -0,0 +1,117 @@
++/* See LICENSE file for copyright and license details. */
++
++/* appearance */
++static const unsigned int borderpx  = 0;        /* border pixel of windows */
++static const unsigned int gappx     = 12;       /* gaps between windows */
++static const unsigned int snap      = 20;       /* snap pixel */
++static const int showbar            = 1;        /* 0 means no bar */
++static const int topbar             = 1;        /* 0 means bottom bar */
++static const char *fonts[]          = { "monospace:size=10" };
++static const char dmenufont[]       = "monospace:size=10";
++static const char col_gray1[]       = "#222224";
++static const char col_gray2[]       = "#444448";
++static const char col_gray3[]       = "#dab997";
++static const char col_gray4[]       = "#eac9a7";
++static const char col_cyan[]        = "#313944";
++static const char *colors[][3]      = {
++	/*               fg         bg         border   */
++	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
++	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
++};
++
++/* tagging */
++static const char *tags[] = { "1", "2", "3", "4", "5", "6"  };
++
++static const Rule rules[] = {{0}};
++	/* xprop(1):
++	 *	WM_CLASS(STRING) = instance, class
++	 *	WM_NAME(STRING) = title
++	 */
++	/* class      instance    title       tags mask     isfloating   monitor */
++	/* { "Gimp",     NULL,       NULL,       0,            1,           -1 },
++	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 }, */
++// };
++
++/* layout(s) */
++static const float mfact     = 0.6; /* factor of master area size [0.05..0.95] */
++static const int nmaster     = 1;    /* number of clients in master area */
++static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
++static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
++
++static const Layout layouts[] = {
++	/* symbol     arrange function */
++	{ "[]=",      tile },    /* first entry is default */
++	{ "><>",      NULL },    /* no layout function means floating behavior */
++	{ "[M]",      monocle },
++};
++
++/* key definitions */
++#define MODKEY Mod4Mask
++#define TAGKEYS(KEY,TAG) \
++	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
++	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
++	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
++	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
++
++/* helper for spawning shell commands in the pre dwm-5.0 fashion */
++#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
++
++/* commands */
++static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
++static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
++static const char *termcmd[]  = { "xterm", NULL };
++
++static Key keys[] = {
++	/* modifier                     key        function        argument */
++	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
++	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
++	{ MODKEY,                       XK_b,      togglebar,      {0} },
++	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
++	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
++	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
++	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
++	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
++	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
++	{ MODKEY,                       XK_Return, zoom,           {0} },
++	{ MODKEY,                       XK_Tab,    view,           {0} },
++	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
++	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
++	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
++	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
++	{ MODKEY,                       XK_space,  setlayout,      {0} },
++	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
++	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
++	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
++	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
++	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
++	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
++	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
++	TAGKEYS(                        XK_1,                      0)
++	TAGKEYS(                        XK_2,                      1)
++	TAGKEYS(                        XK_3,                      2)
++	TAGKEYS(                        XK_4,                      3)
++	TAGKEYS(                        XK_5,                      4)
++	TAGKEYS(                        XK_6,                      5)
++	TAGKEYS(                        XK_7,                      6)
++	TAGKEYS(                        XK_8,                      7)
++	/* TAGKEYS(                        XK_9,                      8) */
++	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
++};
++
++/* button definitions */
++/* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
++static Button buttons[] = {
++	/* click                event mask      button          function        argument */
++	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
++	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
++	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
++	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
++	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
++	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
++	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
++	{ ClkTagBar,            0,              Button1,        view,           {0} },
++	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
++	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
++	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
++};
++
+diff --git a/dwm-uselessgap-20211119-58414bee958f2.diff b/dwm-uselessgap-20211119-58414bee958f2.diff
+new file mode 100644
+index 0000000..f8a3aec
+--- /dev/null
++++ b/dwm-uselessgap-20211119-58414bee958f2.diff
+@@ -0,0 +1,101 @@
++From 58414bee958f2e7ed91d6fe31f503ec4a406981b Mon Sep 17 00:00:00 2001
++From: cirala <thim@cederlund.de>
++Date: Fri, 19 Nov 2021 18:14:07 +0100
++Subject: [PATCH] Fix for dwm-uselessgap
++Previous versions of the patch doubles the
++gap between the master and slave stacks.
++
++---
++ config.def.h |  3 ++-
++ dwm.c        | 38 +++++++++++++++++++++++++++++++-------
++ 2 files changed, 33 insertions(+), 8 deletions(-)
++
++diff --git a/config.def.h b/config.def.h
++index a2ac963..17a205f 100644
++--- a/config.def.h
+++++ b/config.def.h
++@@ -2,6 +2,7 @@
++
++ /* appearance */
++ static const unsigned int borderpx  = 1;        /* border pixel of windows */
+++static const unsigned int gappx     = 6;        /* gaps between windows */
++ static const unsigned int snap      = 32;       /* snap pixel */
++ static const int showbar            = 1;        /* 0 means no bar */
++ static const int topbar             = 1;        /* 0 means bottom bar */
++@@ -34,7 +35,7 @@ static const Rule rules[] = {
++ /* layout(s) */
++ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
++ static const int nmaster     = 1;    /* number of clients in master area */
++-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+++static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
++ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
++
++ static const Layout layouts[] = {
++diff --git a/dwm.c b/dwm.c
++index 5e4d494..b626e89 100644
++--- a/dwm.c
+++++ b/dwm.c
++@@ -52,8 +52,8 @@
++ #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
++ #define LENGTH(X)               (sizeof X / sizeof X[0])
++ #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
++-#define WIDTH(X)                ((X)->w + 2 * (X)->bw)
++-#define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
+++#define WIDTH(X)                ((X)->w + 2 * (X)->bw + gappx)
+++#define HEIGHT(X)               ((X)->h + 2 * (X)->bw + gappx)
++ #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
++ #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
++
++@@ -1277,12 +1277,36 @@ void
++ resizeclient(Client *c, int x, int y, int w, int h)
++ {
++ 	XWindowChanges wc;
+++	unsigned int n;
+++	unsigned int gapoffset;
+++	unsigned int gapincr;
+++	Client *nbc;
++
++-	c->oldx = c->x; c->x = wc.x = x;
++-	c->oldy = c->y; c->y = wc.y = y;
++-	c->oldw = c->w; c->w = wc.width = w;
++-	c->oldh = c->h; c->h = wc.height = h;
++ 	wc.border_width = c->bw;
+++
+++	/* Get number of clients for the client's monitor */
+++	for (n = 0, nbc = nexttiled(c->mon->clients); nbc; nbc = nexttiled(nbc->next), n++);
+++
+++	/* Do nothing if layout is floating */
+++	if (c->isfloating || c->mon->lt[c->mon->sellt]->arrange == NULL) {
+++		gapincr = gapoffset = 0;
+++	} else {
+++		/* Remove border and gap if layout is monocle or only one client */
+++		if (c->mon->lt[c->mon->sellt]->arrange == monocle || n == 1) {
+++			gapoffset = 0;
+++			gapincr = -2 * borderpx;
+++			wc.border_width = 0;
+++		} else {
+++			gapoffset = gappx;
+++			gapincr = 2 * gappx;
+++		}
+++	}
+++
+++	c->oldx = c->x; c->x = wc.x = x + gapoffset;
+++	c->oldy = c->y; c->y = wc.y = y + gapoffset;
+++	c->oldw = c->w; c->w = wc.width = w - gapincr;
+++	c->oldh = c->h; c->h = wc.height = h - gapincr;
+++
++ 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
++ 	configure(c);
++ 	XSync(dpy, False);
++@@ -1688,7 +1712,7 @@ tile(Monitor *m)
++ 	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
++ 		if (i < m->nmaster) {
++ 			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
++-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+++			resize(c, m->wx, m->wy + my, mw - (2*c->bw) + (n > 1 ? gappx : 0), h - (2*c->bw), 0);
++ 			if (my + HEIGHT(c) < m->wh)
++ 				my += HEIGHT(c);
++ 		} else {
++--
++2.33.1
++
+diff --git a/dwm.c b/dwm.c
+index f1d86b2..dae0816 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -52,8 +52,8 @@
+ #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
+ #define LENGTH(X)               (sizeof X / sizeof X[0])
+ #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
+-#define WIDTH(X)                ((X)->w + 2 * (X)->bw)
+-#define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
++#define WIDTH(X)                ((X)->w + 2 * (X)->bw + gappx)
++#define HEIGHT(X)               ((X)->h + 2 * (X)->bw + gappx)
+ #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
+ #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+ 
+@@ -163,7 +163,6 @@ static void detachstack(Client *c);
+ static Monitor *dirtomon(int dir);
+ static void drawbar(Monitor *m);
+ static void drawbars(void);
+-static void enternotify(XEvent *e);
+ static void expose(XEvent *e);
+ static void focus(Client *c);
+ static void focusin(XEvent *e);
+@@ -182,7 +181,6 @@ static void manage(Window w, XWindowAttributes *wa);
+ static void mappingnotify(XEvent *e);
+ static void maprequest(XEvent *e);
+ static void monocle(Monitor *m);
+-static void motionnotify(XEvent *e);
+ static void movemouse(const Arg *arg);
+ static Client *nexttiled(Client *c);
+ static void pop(Client *c);
+@@ -249,13 +247,11 @@ static void (*handler[LASTEvent]) (XEvent *) = {
+ 	[ConfigureRequest] = configurerequest,
+ 	[ConfigureNotify] = configurenotify,
+ 	[DestroyNotify] = destroynotify,
+-	[EnterNotify] = enternotify,
+ 	[Expose] = expose,
+ 	[FocusIn] = focusin,
+ 	[KeyPress] = keypress,
+ 	[MappingNotify] = mappingnotify,
+ 	[MapRequest] = maprequest,
+-	[MotionNotify] = motionnotify,
+ 	[PropertyNotify] = propertynotify,
+ 	[UnmapNotify] = unmapnotify
+ };
+@@ -737,7 +733,6 @@ drawbar(Monitor *m)
+ 	if ((w = m->ww - tw - x) > bh) {
+ 		if (m->sel) {
+ 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+ 			if (m->sel->isfloating)
+ 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+ 		} else {
+@@ -757,25 +752,6 @@ drawbars(void)
+ 		drawbar(m);
+ }
+ 
+-void
+-enternotify(XEvent *e)
+-{
+-	Client *c;
+-	Monitor *m;
+-	XCrossingEvent *ev = &e->xcrossing;
+-
+-	if ((ev->mode != NotifyNormal || ev->detail == NotifyInferior) && ev->window != root)
+-		return;
+-	c = wintoclient(ev->window);
+-	m = c ? c->mon : wintomon(ev->window);
+-	if (m != selmon) {
+-		unfocus(selmon->sel, 1);
+-		selmon = m;
+-	} else if (!c || c == selmon->sel)
+-		return;
+-	focus(c);
+-}
+-
+ void
+ expose(XEvent *e)
+ {
+@@ -1125,23 +1101,6 @@ monocle(Monitor *m)
+ 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
+ }
+ 
+-void
+-motionnotify(XEvent *e)
+-{
+-	static Monitor *mon = NULL;
+-	Monitor *m;
+-	XMotionEvent *ev = &e->xmotion;
+-
+-	if (ev->window != root)
+-		return;
+-	if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
+-		unfocus(selmon->sel, 1);
+-		selmon = m;
+-		focus(NULL);
+-	}
+-	mon = m;
+-}
+-
+ void
+ movemouse(const Arg *arg)
+ {
+@@ -1286,12 +1245,36 @@ void
+ resizeclient(Client *c, int x, int y, int w, int h)
+ {
+ 	XWindowChanges wc;
++	unsigned int n;
++	unsigned int gapoffset;
++	unsigned int gapincr;
++	Client *nbc;
+ 
+-	c->oldx = c->x; c->x = wc.x = x;
+-	c->oldy = c->y; c->y = wc.y = y;
+-	c->oldw = c->w; c->w = wc.width = w;
+-	c->oldh = c->h; c->h = wc.height = h;
+ 	wc.border_width = c->bw;
++
++	/* Get number of clients for the client's monitor */
++	for (n = 0, nbc = nexttiled(c->mon->clients); nbc; nbc = nexttiled(nbc->next), n++);
++
++	/* Do nothing if layout is floating */
++	if (c->isfloating || c->mon->lt[c->mon->sellt]->arrange == NULL) {
++		gapincr = gapoffset = 0;
++	} else {
++		/* Remove border and gap if layout is monocle or only one client */
++		if (c->mon->lt[c->mon->sellt]->arrange == monocle) {
++			gapoffset = 0;
++			gapincr = -2 * borderpx;
++			wc.border_width = 0;
++		} else {
++			gapoffset = gappx;
++			gapincr = 2 * gappx;
++		}
++	}
++
++	c->oldx = c->x; c->x = wc.x = x + gapoffset;
++	c->oldy = c->y; c->y = wc.y = y + gapoffset;
++	c->oldw = c->w; c->w = wc.width = w - gapincr;
++	c->oldh = c->h; c->h = wc.height = h - gapincr;
++
+ 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
+ 	configure(c);
+ 	XSync(dpy, False);
+@@ -1562,7 +1545,7 @@ setup(void)
+ 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+ 		die("no fonts could be loaded.");
+ 	lrpad = drw->fonts->h;
+-	bh = drw->fonts->h + 2;
++	bh = drw->fonts->h + 12;
+ 	updategeom();
+ 	/* init atoms */
+ 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
+@@ -1701,7 +1684,7 @@ tile(Monitor *m)
+ 	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+ 		if (i < m->nmaster) {
+ 			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
+-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
++			resize(c, m->wx, m->wy + my, mw - (2*c->bw) + (n > 1 ? gappx : 0), h - (2*c->bw), 0);
+ 			if (my + HEIGHT(c) < m->wh)
+ 				my += HEIGHT(c);
+ 		} else {
