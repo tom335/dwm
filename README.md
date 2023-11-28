@@ -2,6 +2,14 @@ dwm - dynamic window manager
 ============================
 dwm is an extremely fast, small, and dynamic window manager for X.
 
+This is a patched version of dwm, removing the following methods (to prevent focus on mouse hover):
+```
+eventnotify
+motionnotify
+```
+And with the `uselessgap` patch applied as well.
+
+A small padding was also added to the top bar.
 
 Requirements
 ------------
